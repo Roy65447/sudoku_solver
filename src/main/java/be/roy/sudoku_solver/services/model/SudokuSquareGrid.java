@@ -10,6 +10,10 @@ import lombok.NoArgsConstructor;
 public class SudokuSquareGrid {
   private final SudokuSquare[] squares = new SudokuSquare[9];
 
+  public SudokuSquareGrid(int[] squares) {
+    this.setSquares(squares);
+  }
+
   /**
    * Set the value of square in the 3x3 grid
    * 
