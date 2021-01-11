@@ -3,12 +3,16 @@ package be.roy.sudoku_solver.services.model;
 import java.util.List;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 public class SudokuSquareGrid {
   private final SudokuSquare[] squares = new SudokuSquare[9];
+
+  public SudokuSquareGrid() {
+    for(int i = 0; i < 9; i++){
+      this.squares[i] = new SudokuSquare();
+    }
+  }
 
   public SudokuSquareGrid(int[] squares) {
     this.setSquares(squares);
@@ -30,6 +34,7 @@ public class SudokuSquareGrid {
   public void setSquares(int[] squareValues) {
     for (int i = 0; i < squareValues.length; i++) {
       if (squareValues[i] <= 9) {
+        this.squares[i] = new SudokuSquare();
         this.squares[i].setValue(squareValues[i]);
       }
     }
