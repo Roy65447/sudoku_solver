@@ -52,10 +52,10 @@ public class SudokuHintService {
       HashMap<Integer, SudokuSquareGrid> solved) {
     var startId = goToTop(gridId, dimension);
     for (int i = startId; i < solved.size(); i += dimension) {
-      if (gridId != startId) { // don't search in current grid
-        var gridTop = goToTop(squareId, 3);
+      if (gridId != i) { // don't search in current grid
+        var gridTop = goToTop(squareId, dimension);
         var squares = solved.get(i).getSquares();
-        for (int j = gridTop; j < squares.length; j += 3) {
+        for (int j = gridTop; j < squares.length; j += dimension) {
           if (squares[j].getValue() != 0 && hints.contains(squares[j].getValue())) {
             hints.remove(Integer.valueOf(squares[j].getValue()));
           }
@@ -65,7 +65,7 @@ public class SudokuHintService {
     return hints;
   }
 
-  private int goToTop(int index, int dimension) {
+  public int goToTop(int index, int dimension) {
     while (index > dimension) {
       index -= dimension;
     }
@@ -89,7 +89,7 @@ public class SudokuHintService {
     return hints;
   }
 
-  private int goToStart(int index, int dimension) {
+  public int goToStart(int index, int dimension) {
     while (index % dimension != 0) {
       index--;
     }
