@@ -2,7 +2,6 @@ package be.roy.sudoku_solver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -72,6 +71,7 @@ class SudokuSolverApplicationTests {
 				.map(SudokuSquare::getValue).collect(Collectors.toList());
 		var sudokuSolvedValues = sudoku.getSolved().values().stream().map(SudokuSquareGrid::getSquares)
 				.flatMap(Arrays::stream).map(SudokuSquare::getValue).collect(Collectors.toList());
+				System.out.println(sudoku);
 		assertEquals(solvedValues, sudokuSolvedValues);
 	}
 }

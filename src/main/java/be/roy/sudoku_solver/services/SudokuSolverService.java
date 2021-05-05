@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import be.roy.sudoku_solver.services.model.Sudoku;
+import be.roy.sudoku_solver.services.model.SudokuSquare;
 import be.roy.sudoku_solver.services.model.SudokuSquareGrid;
 import lombok.var;
 
@@ -15,12 +16,17 @@ public class SudokuSolverService {
 
   public Sudoku solveSudoku(HashMap<Integer, SudokuSquareGrid> unsolved) {
     var sudoku = new Sudoku(unsolved);
-    sudoku = fillValues(sudokuHintService.fillHints(sudoku));
+    sudoku = replaceSingleHints(sudokuHintService.fillHints(sudoku));
     return sudoku;
   }
 
-  private Sudoku fillValues(Sudoku sudoku) {
-    return replaceSingleHints(sudoku);
+  private HashMap<Integer, SudokuSquareGrid> fillSquare(SudokuSquare square, SudokuSquareGrid grid, int squareId,
+      int gridId, int dimension, HashMap<Integer, SudokuSquareGrid> solved) {
+    square.setValue(square.getHints().get(0));
+    grid.setSquare(square, squareId);
+    solved.replace(gridId, grid);
+    solved = removeValueFromOtherHints(solved, gridId, squareId, dimension, square.getValue());
+    return solved;
   }
 
   private Sudoku replaceSingleHints(Sudoku sudoku) {
@@ -29,12 +35,8 @@ public class SudokuSolverService {
       var grid = solved.get(gridId);
       for (int squareId = 0; squareId < grid.getSquares().length; squareId++) {
         var square = grid.getSquares()[squareId];
-        if (square.getValue() == 0 && square.getHints().size() == 1) {
-          var squareValue = square.getHints().get(0);
-          grid.getSquares()[squareId].setValue(squareValue);
-          solved.replace(gridId, grid);
-          solved = removeValueFromOtherHints(solved, gridId, squareId, sudoku.getDimension(), squareValue);
-        }
+        if (square.getValue() == 0 && square.getHints().size() == 1)
+          solved = fillSquare(square, grid, squareId, gridId, sudoku.getDimension(), solved);
       }
     }
     sudoku.setSolved(solved);
@@ -44,7 +46,15 @@ public class SudokuSolverService {
   private HashMap<Integer, SudokuSquareGrid> removeValueFromOtherHints(HashMap<Integer, SudokuSquareGrid> solved,
       int gridId, int squareId, int dimension, int squareValue) {
     solved = removeValueFromGridHints(solved, squareValue, gridId, dimension);
-    solved = removeValueFromAxesHints(solved, gridId, squareId, dimension, squareValue);
+    solved = removeValueFromAxisHints(solved, gridId, squareId, dimension, squareValue);
+    return solved;
+  }
+
+  private HashMap<Integer, SudokuSquareGrid> removeValueFromHints(SudokuSquare square, int squareValue,
+      SudokuSquareGrid grid, int squareId, int gridId, HashMap<Integer, SudokuSquareGrid> solved) {
+    square.getHints().remove(Integer.valueOf(squareValue));
+    grid.setSquare(square, squareId);
+    solved.replace(gridId, grid);
     return solved;
   }
 
@@ -54,77 +64,44 @@ public class SudokuSolverService {
     for (var squareId = 0; squareId < grid.getSquares().length; squareId++) {
       var square = grid.getSquares()[squareId];
       if (square.getValue() == 0 && square.getHints().contains(squareValue)) {
-        square.getHints().remove(Integer.valueOf(squareValue));
-        grid.setSquare(square, squareId);
-        solved.replace(gridId, grid);
-        if (square.getHints().size() == 1) {
-          square.setValue(square.getHints().get(0));
-          grid.setSquare(square, squareId);
-          solved.replace(gridId, grid);
-          solved = removeValueFromOtherHints(solved, gridId, squareId, dimension, square.getValue());
-        }
+        solved = removeValueFromHints(square, squareValue, grid, squareId, gridId, solved);
+        if (square.getHints().size() == 1)
+          solved = fillSquare(square, grid, squareId, gridId, dimension, solved);
       }
     }
     return solved;
   }
 
-  private HashMap<Integer, SudokuSquareGrid> removeValueFromAxesHints(HashMap<Integer, SudokuSquareGrid> solved,
+  private HashMap<Integer, SudokuSquareGrid> removeValueFromAxisHints(HashMap<Integer, SudokuSquareGrid> solved,
       int gridId, int squareId, int dimension, int squareValue) {
-    solved = removeValueFromVerticalAxisHints(solved, gridId, squareId, dimension, squareValue);
-    solved = removeValueFromHorizontalAxisHints(solved, gridId, squareId, dimension, squareValue);
-    return solved;
-  }
-
-  private HashMap<Integer, SudokuSquareGrid> removeValueFromVerticalAxisHints(HashMap<Integer, SudokuSquareGrid> solved,
-      int gridId, int squareId, int dimension, int squareValue) {
-    var startId = sudokuHintService.goToTop(gridId, dimension);
-    for (int i = startId; i < solved.size(); i += dimension) {
-      if (gridId != i) {
-        var gridTop = sudokuHintService.goToTop(squareId, dimension);
-        var grid = solved.get(i);
-        var squares = grid.getSquares();
-        for (int j = gridTop; j < squares.length; j += dimension) {
-          var square = squares[j];
-          if (square.getValue() == 0 && square.getHints().contains(squareValue)) {
-            square.getHints().remove(Integer.valueOf(squareValue));
-            grid.setSquare(square, j);
-            solved.replace(i, grid);
-            if (square.getHints().size() == 1) {
-              square.setValue(square.getHints().get(0));
-              grid.setSquare(square, j);
-              solved.replace(i, grid);
-              solved = removeValueFromOtherHints(solved, i, j, dimension, square.getValue());
+    boolean horizontal = true;
+    for (int count = 0; count <= 1; count++) {
+      var startId = horizontal ? sudokuHintService.goToStart(gridId, dimension)
+          : sudokuHintService.goToTop(gridId, dimension);
+      for (int i = startId; horizontal ? i < startId + dimension
+          : i < solved.size(); i = horizontal ? i + 1 : i + dimension) {
+        if (gridId != i) {
+          /*
+           * Gridstartpoint for the horizontal axis is the grid most left from our current
+           * position. For the vertical axis, this is the grid most upper grid from our
+           * current position
+           */
+          var gridStartPoint = horizontal ? sudokuHintService.goToStart(squareId, dimension)
+              : sudokuHintService.goToTop(squareId, dimension);
+          var grid = solved.get(i);
+          var squares = grid.getSquares();
+          for (int j = gridStartPoint; horizontal ? j < gridStartPoint + dimension
+              : j < squares.length; j = horizontal ? j + 1 : j + dimension) {
+            var square = squares[j];
+            if (square.getValue() == 0 && square.getHints().contains(squareValue)) {
+              solved = removeValueFromHints(square, squareValue, grid, j, i, solved);
+              if (square.getHints().size() == 1)
+                solved = fillSquare(square, grid, j, i, dimension, solved);
             }
           }
         }
       }
-    }
-    return solved;
-  }
-
-  private HashMap<Integer, SudokuSquareGrid> removeValueFromHorizontalAxisHints(
-      HashMap<Integer, SudokuSquareGrid> solved, int gridId, int squareId, int dimension, int squareValue) {
-    var startId = sudokuHintService.goToStart(gridId, dimension);
-    for (int i = startId; i < startId + dimension; i++) {
-      if (gridId != i) {
-        var gridStart = sudokuHintService.goToStart(squareId, dimension);
-        var grid = solved.get(i);
-        var squares = grid.getSquares();
-        for (int j = gridStart; j < gridStart + dimension; j++) {
-          var square = squares[j];
-          if (square.getValue() == 0 && square.getHints().contains(squareValue)) {
-            square.getHints().remove(Integer.valueOf(squareValue));
-            grid.setSquare(square, j);
-            solved.replace(i, grid);
-            if (square.getHints().size() == 1) {
-              square.setValue(square.getHints().get(0));
-              grid.setSquare(square, j);
-              solved.replace(i, grid);
-              solved = removeValueFromOtherHints(solved, i, j, dimension, square.getValue());
-            }
-          }
-        }
-      }
+      horizontal = false;
     }
     return solved;
   }
