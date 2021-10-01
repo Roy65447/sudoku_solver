@@ -27,6 +27,8 @@ public class Square {
 
     public void setValue(int value) {
         this.value = value;
-        hints.clear();
+        if (!(value == 0)) {
+            hints.clear();
+        }
     }
 }
