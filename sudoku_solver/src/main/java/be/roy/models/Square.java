@@ -20,7 +20,7 @@ public class Square {
     }
 
     public void addHint(int hintValue) {
-        if (!hints.contains(hintValue)) {
+        if (!hints.contains(hintValue) && hintValue < 10) {
             hints.add(hintValue);
         }
     }
