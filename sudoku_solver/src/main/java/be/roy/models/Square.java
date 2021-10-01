@@ -15,6 +15,11 @@ public class Square {
         hints = new ArrayList<Integer>();
     }
 
+    public Square(int value) {
+        this.value = value;
+        hints = new ArrayList<Integer>();
+    }
+
     public void removeHint(int hintValue) {
         hints.removeIf(value -> value.equals(hintValue));
     }
