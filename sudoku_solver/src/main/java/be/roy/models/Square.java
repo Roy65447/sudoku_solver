@@ -31,7 +31,7 @@ public class Square {
     public void removeHint(int hintValue) {
         hints.removeIf(value -> value.equals(hintValue));
     }
-
+//TODO check usefullness
     public void addHint(int hintValue) {
         if (!hints.contains(hintValue) && hintValue < 10) {
             hints.add(hintValue);
