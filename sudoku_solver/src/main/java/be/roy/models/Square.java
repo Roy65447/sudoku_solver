@@ -1,6 +1,7 @@
 package be.roy.models;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +21,11 @@ public class Square {
 
     public Square(int value) {
         this.value = value;
-        hints = new ArrayList<Integer>();
+        if (value == 0) {
+            hints = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
+        } else {
+            hints = new ArrayList<Integer>();
+        }
     }
 
     public void removeHint(int hintValue) {
