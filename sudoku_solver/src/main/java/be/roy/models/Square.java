@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * represents 1 single square of sudoku
+ */
 @Getter
 public class Square {
     private int value;

@@ -1,8 +1,13 @@
 package be.roy.models;
 
 import lombok.Getter;
+import lombok.Setter;
 
+/**
+ * A class that contains the unsolved sudoku and the answer
+ */
 @Getter
+@Setter
 public class Sudoku {
     private final int DIMENSION = 3;
     private Square[][] unsolved;
