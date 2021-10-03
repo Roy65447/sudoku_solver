@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -15,13 +15,12 @@ import be.roy.models.Sudoku;
 
 @SpringBootTest
 public class ModelTests {
-    private Square square;
-    private Sudoku sudoku;
+    private static Square square;
+    private static Sudoku sudoku;
 
-    @BeforeEach
-    void initObjects() {
+    @BeforeAll
+    static void initObjects() {
         square = new Square();
-
         Square[][] unsolved = {
                 { new Square(0), new Square(0), new Square(0), new Square(2), new Square(6), new Square(0),
                         new Square(7), new Square(0), new Square(1) },
@@ -46,15 +45,21 @@ public class ModelTests {
 
     @Test
     void testAddHint() {
-        square.addHint(3);
-        assertArrayEquals(new ArrayList<Integer>(Arrays.asList(3)).toArray(), square.getHints().toArray());
+            square.addHint(3);
+            assertArrayEquals(new ArrayList<Integer>(Arrays.asList(3)).toArray(), square.getHints().toArray());
+    }
+
+    @Test
+    void testRemoveHint() {
+            square.removeHint(3);
+            assertEquals(square.getHints(), new ArrayList<Integer>());
     }
 
     @Test
     void testAddHintAndRemoveHint() {
-        square.addHint(3);
-        assertArrayEquals(new ArrayList<Integer>(Arrays.asList(3)).toArray(), square.getHints().toArray());
-        square.removeHint(3);
+        square.addHint(6);
+        assertArrayEquals(new ArrayList<Integer>(Arrays.asList(6)).toArray(), square.getHints().toArray());
+        square.removeHint(6);
         assertEquals(square.getHints(), new ArrayList<Integer>());
     }
 
