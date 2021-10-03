@@ -21,7 +21,7 @@ public class SudokuSolverService {
 
     private Square[][] replaceSingleHints(Sudoku sudoku) {
         var incompleteSudoku = sudoku.getUnsolved();
-        incompleteSudoku = hintService.fillHints(incompleteSudoku, sudoku.getDIMENSION());
+        incompleteSudoku = hintService.filterHints(incompleteSudoku, sudoku.getDIMENSION());
         return incompleteSudoku;
     }
 }
