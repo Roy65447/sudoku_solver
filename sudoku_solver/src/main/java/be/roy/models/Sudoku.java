@@ -14,8 +14,9 @@ public class Sudoku {
     private Square[][] solved;
 
     public Sudoku() {
-        unsolved = new Square[DIMENSION ^ 2][DIMENSION ^ 2];
-        solved = new Square[DIMENSION ^ 2][DIMENSION ^ 2];
+        var sudokuDimension = DIMENSION * DIMENSION;
+        unsolved = new Square[sudokuDimension][sudokuDimension];
+        solved = new Square[sudokuDimension][sudokuDimension];
     }
 
     public Sudoku(Square[][] unsolved) {
