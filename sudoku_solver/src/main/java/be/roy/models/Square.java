@@ -28,8 +28,8 @@ public class Square {
         }
     }
 
-    public void removeHint(int hintValue) {
-        hints.removeIf(value -> value.equals(hintValue));
+    public void removeHint(int value) {
+        hints.removeIf(hint -> hint.equals(value));
     }
 
     public void setValue(int value) {
