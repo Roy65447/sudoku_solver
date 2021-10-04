@@ -12,16 +12,19 @@ public class Sudoku {
     private final int DIMENSION = 3;
     private Square[][] unsolved;
     private Square[][] solved;
+    private boolean isSolved;
 
     public Sudoku() {
         var sudokuDimension = DIMENSION * DIMENSION;
         unsolved = new Square[sudokuDimension][sudokuDimension];
         solved = new Square[sudokuDimension][sudokuDimension];
+        isSolved = false;
     }
 
     public Sudoku(Square[][] unsolved) {
         this.unsolved = unsolved;
         this.solved = unsolved;
+        isSolved = false;
     }
 
     // For console testing
