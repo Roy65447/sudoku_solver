@@ -2,7 +2,9 @@ package be.roy.services;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
+
 import org.springframework.stereotype.Service;
+
 import be.roy.models.Square;
 import be.roy.utils.BoundaryCalc;
 import lombok.var;
@@ -22,7 +24,7 @@ public class HintService {
      */
     Square[][] filterHints(Square[][] incompleteSudoku, final int DIMENSION) {
         for (int row = 0; row < incompleteSudoku.length; row++) {
-            for (int col = 0; col < incompleteSudoku[col].length; col++) {
+            for (int col = 0; col < incompleteSudoku[row].length; col++) {
                 var square = incompleteSudoku[row][col];
                 if (square.getValue() == 0) {
                     square = removeHints(searchSudokuValues(incompleteSudoku, row, col, DIMENSION), square);
