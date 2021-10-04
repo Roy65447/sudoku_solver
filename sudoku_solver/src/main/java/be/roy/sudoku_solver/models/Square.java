@@ -1,4 +1,4 @@
-package be.roy.models;
+package be.roy.sudoku_solver.models;
 
 import java.util.ArrayList;
 import java.util.Arrays;

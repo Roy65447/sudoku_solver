@@ -9,8 +9,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import be.roy.models.Square;
-import be.roy.models.Sudoku;
+import be.roy.sudoku_solver.models.Square;
+import be.roy.sudoku_solver.models.Sudoku;
 
 @SpringBootTest
 public class ModelTests {

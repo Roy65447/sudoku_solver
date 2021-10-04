@@ -4,16 +4,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import be.roy.models.Square;
-import be.roy.models.Sudoku;
-import be.roy.services.SudokuSolverService;
+import be.roy.sudoku_solver.models.Square;
+import be.roy.sudoku_solver.models.Sudoku;
+import be.roy.sudoku_solver.services.SudokuSolverService;
 
 @SpringBootTest
 public class SudokuSolverTests {
     private static Sudoku sudoku;
-    private SudokuSolverService sudokuSolverService = new SudokuSolverService();;
+    @Autowired
+    private SudokuSolverService sudokuSolverService;
 
     @BeforeAll
     static void initObjects() {

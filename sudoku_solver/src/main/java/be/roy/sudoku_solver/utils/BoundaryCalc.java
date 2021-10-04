@@ -1,4 +1,4 @@
-package be.roy.utils;
+package be.roy.sudoku_solver.utils;
 
 import lombok.experimental.UtilityClass;
 

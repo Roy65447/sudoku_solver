@@ -1,11 +1,11 @@
-package be.roy.services;
+package be.roy.sudoku_solver.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import be.roy.models.Square;
-import be.roy.models.Sudoku;
-import be.roy.utils.BoundaryCalc;
+import be.roy.sudoku_solver.models.Square;
+import be.roy.sudoku_solver.models.Sudoku;
+import be.roy.sudoku_solver.utils.BoundaryCalc;
 import lombok.var;
 
 /**
@@ -13,7 +13,8 @@ import lombok.var;
  */
 @Service
 public class SudokuSolverService {
-    private HintService hintService = new HintService();
+    @Autowired
+    private HintService hintService;
 
     public Sudoku solveSudoku(Sudoku sudoku) {
         sudoku.setSolved(hintService.filterHints(sudoku.getSolved(), sudoku.getDIMENSION()));

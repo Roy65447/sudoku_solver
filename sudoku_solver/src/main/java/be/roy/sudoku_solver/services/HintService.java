@@ -1,12 +1,12 @@
-package be.roy.services;
+package be.roy.sudoku_solver.services;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
 
 import org.springframework.stereotype.Service;
 
-import be.roy.models.Square;
-import be.roy.utils.BoundaryCalc;
+import be.roy.sudoku_solver.models.Square;
+import be.roy.sudoku_solver.utils.BoundaryCalc;
 import lombok.var;
 
 /**
