@@ -100,7 +100,6 @@ public class SudokuSolverTests {
                                 new Square(0), new Square(0), new Square(4), new Square(0) } 
                 };
                 var notFunSudoku = new Sudoku(notFunUnsolved);
-                System.out.println(notFunSudoku);
                 sudokuSolverService.solveSudoku(notFunSudoku);
                 System.out.println(notFunSudoku);
         }
