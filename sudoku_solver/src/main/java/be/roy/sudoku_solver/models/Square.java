@@ -1,41 +1,17 @@
 package be.roy.sudoku_solver.models;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
  * represents 1 single square of sudoku
  */
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Square {
     private int value;
-    @Setter
-    private ArrayList<Integer> hints;
-
-    public Square() {
-        hints = new ArrayList<Integer>();
-    }
-
-    public Square(int value) {
-        this.value = value;
-        if (value == 0) {
-            hints = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
-        } else {
-            hints = new ArrayList<Integer>();
-        }
-    }
-
-    public void removeHint(int value) {
-        hints.removeIf(hint -> hint.equals(value));
-    }
-
-    public void setValue(int value) {
-        this.value = value;
-        if (!(value == 0)) {
-            hints.clear();
-        }
-    }
 }

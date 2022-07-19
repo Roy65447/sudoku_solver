@@ -1,11 +1,8 @@
 package be.roy.sudoku_solver.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import be.roy.sudoku_solver.models.Square;
 import be.roy.sudoku_solver.models.Sudoku;
-import be.roy.sudoku_solver.utils.BoundaryCalc;
 import lombok.var;
 
 /**
@@ -13,81 +10,86 @@ import lombok.var;
  */
 @Service
 public class SudokuSolverService {
-    @Autowired
-    private HintService hintService;
+    Sudoku solvedSudoku;
 
     public Sudoku solveSudoku(Sudoku sudoku) {
-        sudoku.setSolved(hintService.filterHints(sudoku.getSolved(), sudoku.getDIMENSION()));
-        sudoku.setSolved(replaceSingleHints(sudoku));
+        solvedSudoku = sudoku;
+        var incompleteSudoku = sudoku.getSolved();
+        incompleteSudoku[0][0].getValue();
+        int sudokuSize = incompleteSudoku.length;
+        if (backtrack(incompleteSudoku, sudokuSize)) {
+            return solvedSudoku;
+        }
         return sudoku;
     }
 
-    private Square[][] replaceSingleHints(Sudoku sudoku) {
-        var incompleteSudoku = sudoku.getSolved();
-        for (int row = 0; row < incompleteSudoku.length; row++) {
-            for (int col = 0; col < incompleteSudoku[row].length; col++) {
-                if (incompleteSudoku[row][col].getHints().size() == 1) {
-                    incompleteSudoku = replaceAndRemoveValueFromHints(incompleteSudoku, row, col,
-                            sudoku.getDIMENSION());
+    private boolean backtrack(Square[][] sudoku, int sudokuSize) {
+        int row = -1;
+        int col = -1;
+        boolean solved = true;
+        for (int i = 0; i < sudokuSize; i++) {
+            for (int j = 0; j < sudokuSize; j++) {
+                if (sudoku[i][j].getValue() == 0) {
+                    row = i;
+                    col = j;
+                    // still not solved
+                    solved = false;
+                    break;
+                }
+                if (!solved)
+                    break;
+            }
+        }
+
+        if (solved)
+            return true;
+
+        // if not solved backtrack
+        for (int i = 1; i <= sudokuSize; i++) {
+            if (isSafe(sudoku, row, col, i)) {
+                sudoku[row][col].setValue(i);
+                if (backtrack(sudoku, sudokuSize)) {
+                    solvedSudoku.setSolved(sudoku);
+                    return true;
+                } else {
+                    // replace value with 0 to backtrack until correct number is placed
+                    sudoku[row][col].setValue(0);
                 }
             }
         }
-        return incompleteSudoku;
+        return false;
     }
 
-    private Square[][] replaceAndRemoveValueFromHints(Square[][] incompleteSudoku, int row, int col,
-            final int DIMENSION) {
-        var value = incompleteSudoku[row][col].getHints().get(0);
-        incompleteSudoku[row][col].setValue(value);
-        incompleteSudoku = searchGrid(incompleteSudoku, row, col, DIMENSION, value);
-        incompleteSudoku = searchAxes(incompleteSudoku, row, col, DIMENSION, value);
-        return incompleteSudoku;
+    private boolean isSafe(Square[][] sudoku, int row, int col, int value) {
+        if (checkRowAndColumnClash(sudoku, row, col, value) || checkBoxClash(sudoku, row, col, value))
+            return false;
+        // no clash
+        return true;
     }
 
-    private Square[][] searchGrid(Square[][] incompleteSudoku, int row, int col, final int DIMENSION, int value) {
-        var bounds = BoundaryCalc.calculateBounds(row, col, DIMENSION); // [start index for row, start index for col]
-        for (int i = bounds[0]; i < bounds[0] + DIMENSION; i++) {
-            for (int j = bounds[1]; j < bounds[1] + DIMENSION; j++) {
-                if (incompleteSudoku[i][j].getValue() == 0) {
-                    incompleteSudoku[i][j].getHints().removeIf(hint -> hint == value);
-                    if (incompleteSudoku[i][j].getHints().size() == 1) {
-                        replaceAndRemoveValueFromHints(incompleteSudoku, i, j, DIMENSION);
-                    }
-                }
+    // check if the number already occurs in the same row/col
+    private boolean checkRowAndColumnClash(Square[][] sudoku, int row, int col, int value) {
+        for (int i = 0; i < sudoku.length; i++) {
+            if (sudoku[row][i].getValue() == value)
+                return true;
+            if (sudoku[i][col].getValue() == value)
+                return true;
+        }
+        return false;
+    }
+
+    // check if the number occurs in the same 3x3 grid
+    private boolean checkBoxClash(Square[][] sudoku, int row, int col, int value) {
+        int dimension = (int) Math.sqrt(sudoku.length);
+        int boxRowStart = row - row % dimension;
+        int boxColStart = col - col % dimension;
+
+        for (int i = boxRowStart; i < boxRowStart + dimension; i++) {
+            for (int j = boxColStart; j < boxColStart + dimension; j++) {
+                if (sudoku[i][j].getValue() == value)
+                    return true;
             }
         }
-        return incompleteSudoku;
-    }
-
-    private Square[][] searchAxes(Square[][] incompleteSudoku, int row, int col, final int DIMENSION, int value) {
-        incompleteSudoku = searchVerticalAxis(incompleteSudoku, row, col, DIMENSION, value);
-        incompleteSudoku = searchHorizontalAxis(incompleteSudoku, row, col, DIMENSION, value);
-        return incompleteSudoku;
-    }
-
-    private Square[][] searchVerticalAxis(Square[][] incompleteSudoku, int row, int col, final int DIMENSION,
-            int value) {
-        for (int i = 0; i < incompleteSudoku.length; i++) {
-            if (incompleteSudoku[i][col].getValue() == 0) {
-                incompleteSudoku[i][col].getHints().removeIf(hint -> hint == value);
-                if (incompleteSudoku[i][col].getHints().size() == 1) {
-                    replaceAndRemoveValueFromHints(incompleteSudoku, i, col, DIMENSION);
-                }
-            }
-        }
-        return incompleteSudoku;
-    }
-
-    private Square[][] searchHorizontalAxis(Square[][] incompleteSudoku, int row, int col, final int DIMENSION,
-            int value) {
-        for (int i = 0; i < incompleteSudoku.length; i++) {
-            if (incompleteSudoku[row][i].getValue() == 0) {
-                incompleteSudoku[row][i].getHints().removeIf(hint -> hint == value);
-                if (incompleteSudoku[row][i].getHints().size() == 1) {
-                    replaceAndRemoveValueFromHints(incompleteSudoku, row, i, DIMENSION);
-                }
-            }
-        }
-        return incompleteSudoku;
+        return false;
     }
 }

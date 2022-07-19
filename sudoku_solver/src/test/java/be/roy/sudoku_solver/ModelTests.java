@@ -2,9 +2,6 @@ package be.roy.sudoku_solver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,17 +40,8 @@ public class ModelTests {
         }
 
         @Test
-        void testRemoveHint() {
-                square.setHints(new ArrayList<Integer>(Arrays.asList(3)));
-                square.removeHint(3);
-                assertEquals(square.getHints(), new ArrayList<Integer>());
-        }
-
-        @Test
         void testSetValue() {
-                square.setHints(new ArrayList<Integer>(Arrays.asList(3, 6, 9)));
                 square.setValue(6);
-                assertEquals(0, square.getHints().size());
                 assertEquals(6, square.getValue());
         }
 
