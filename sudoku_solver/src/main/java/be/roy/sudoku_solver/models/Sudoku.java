@@ -21,21 +21,32 @@ public class Sudoku {
         sudokuSolved = false;
     }
 
-    public Sudoku(Square[][] unsolved) {
-        this.unsolved = unsolved;
-        this.solved = unsolved;
+    public Sudoku(int[][] unsolved) {
+        Square[][] convertedUnsolved = convertIntArrayToSquareArray(unsolved);
+        this.unsolved = convertedUnsolved;
+        this.solved = convertedUnsolved;
         sudokuSolved = false;
     }
 
+    private Square[][] convertIntArrayToSquareArray(int[][] unsolved) {
+        Square[][] convertedUnsolved = new Square[9][9];
+        for (int i = 0; i < unsolved.length; i++) {
+            for (int j = 0; j < unsolved[i].length; j++) {
+                convertedUnsolved[i][j] = new Square(unsolved[i][j]);
+            }
+        }
+        return convertedUnsolved;
+    }
+    
     // For console testing
     private String convertArrayToString(Square[][] solved) {
         var sudokuString = "";
         for (int i = 0; i < solved.length; i++) {
-            if (i == 3 || i == 6) {
+            if (i % DIMENSION == 0 && i != 0) {
                 sudokuString += "---------------------\n";
             }
             for (int j = 0; j < solved[i].length; j++) {
-                if (j == 3 || j == 6) {
+                if (j % DIMENSION == 0 && j != 0) {
                     sudokuString += "| ";
                 }
                 sudokuString = sudokuString + (solved[i][j].getValue() == 0 ? "." : solved[i][j].getValue()) + " ";
